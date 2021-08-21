@@ -1,4 +1,4 @@
-// import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import User from 'App/Models/User';
 import CreateUser from 'App/Validators/CreateUserValidator';
 import LoginUser from 'App/Validators/LoginUserValidator';
@@ -7,7 +7,8 @@ import LoginUser from 'App/Validators/LoginUserValidator';
 
 
 export default class UsersController {
-    public async register({ request, response }) {
+    public async register({ request, response }: HttpContextContract) {
+      try {
         const user = new User();
         const payload = await request.validate(CreateUser);
     
@@ -16,21 +17,20 @@ export default class UsersController {
         user.password = payload.password;
     
         await user.save();
-        response.status(201);
-    
-        if (!user.$isPersisted) {
-          return {
-            status: 'fail',
-            message: 'Failed to register user'
-          };
-        }
-    
-        return {
+        return response.status(201).json({
           status: 'success',
           data: user,
           message: 'User registered successfully',
-        };
+        });
+  
+      } catch (error) {
+        return response.status(404).json({
+          status: 'fail',
+          message: 'Failed to register user',
+        });
       }
+    }
+  
 
       public async login({ auth, request }) {
         const { email, password } = await request.validate(LoginUser);
