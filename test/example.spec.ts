@@ -10,7 +10,6 @@ test.group('Welcome', () => {
      * Make request
      */
     const  text  = await supertest(BASE_URL).get('/').expect(200)
-    console.log(text)
     assert.equal(text.text, '{"hello":"world"}')
 })
 })
